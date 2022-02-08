@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "730307653034",
+    "project_id": "practice-cloud-functions-4d349",
+    "storage_bucket": "practice-cloud-functions-4d349.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:730307653034:android:a432d121fa3023fb6ecfd3",
+        "android_client_info": {
+          "package_name": "com.eigoakita.practice_cloud_functions"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "730307653034-1kfehi9i5l0bv5h87e8lqrpjodckg95k.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB231ZYtBiLdmql9dlk2ZVmr0YHcL4xO30"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "730307653034-1kfehi9i5l0bv5h87e8lqrpjodckg95k.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
