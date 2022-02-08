@@ -4,6 +4,12 @@ import 'package:flutter/material.dart';
 class MessageArguments {
   final RemoteMessage message;
 
+  ///RemoteMessage概要
+  ///RemoteMessageのプッシュ通知のタイトル、テキストのプロパティがnotification
+  ///notificationはRemoteNotificationクラス
+  ///RemoteNotificationクラスのAndroidNotification,AppleNotificationとAndroid/iOS
+  ///固有のプロパティが用意されている
+
   final bool openedApplication;
 
   MessageArguments(this.message, this.openedApplication);
@@ -54,6 +60,8 @@ class MessageView extends StatelessWidget {
               row('Sent Time', message.sentTime?.toString()),
               row('Thread ID', message.threadId),
               row('Time to Live (TTL)', message.ttl?.toString()),
+
+              ///notification を取得して、null じゃなかったら iOS/Android それぞれ固有のプロパティを表示
               if (notification != null) ...[
                 Padding(
                   padding: const EdgeInsets.only(top: 16),

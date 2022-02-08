@@ -2,6 +2,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+///PUSH通知パーミッションの許可ダイアログを表示して、パーミッション状態を表示するWidget
 class Permissions extends StatefulWidget {
   const Permissions({Key? key}) : super(key: key);
 
@@ -19,8 +20,10 @@ class _Permissions extends State<Permissions> {
       _fetching = true;
     });
 
+    ///プッシュ通知のパーミッション許可ダイアログは以下のメソッドで表示
+    ///requestPermission メソッドの引数は以下で指定
     NotificationSettings settings =
-    await FirebaseMessaging.instance.requestPermission(
+        await FirebaseMessaging.instance.requestPermission(
       announcement: true,
       carPlay: true,
       criticalAlert: true,
@@ -38,8 +41,9 @@ class _Permissions extends State<Permissions> {
       _fetching = true;
     });
 
+    ///プッシュ通知のパーミッション許可ダイアログは以下のメソッドで表示
     NotificationSettings settings =
-    await FirebaseMessaging.instance.getNotificationSettings();
+        await FirebaseMessaging.instance.getNotificationSettings();
 
     setState(() {
       _requested = true;
