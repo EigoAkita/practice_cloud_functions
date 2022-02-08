@@ -2,7 +2,6 @@
     package="com.eigoakita.practice_cloud_functions">
    <application
         android:label="practice_cloud_functions"
-        android:name=".Application"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
