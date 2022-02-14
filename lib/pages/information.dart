@@ -1,8 +1,9 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
-class MessageArguments {
+class InformationArguments {
   final RemoteMessage message;
+  final bool openedApplication;
 
   ///RemoteMessage概要
   ///RemoteMessageのプッシュ通知のタイトル、テキストのプロパティがnotification
@@ -10,13 +11,11 @@ class MessageArguments {
   ///RemoteNotificationクラスのAndroidNotification,AppleNotificationとAndroid/iOS
   ///固有のプロパティが用意されている
 
-  final bool openedApplication;
-
-  MessageArguments(this.message, this.openedApplication);
+  InformationArguments(this.message, this.openedApplication);
 }
 
-class MessageView extends StatelessWidget {
-  const MessageView({Key? key}) : super(key: key);
+class InformationView extends StatelessWidget {
+  const InformationView({Key? key}) : super(key: key);
 
   Widget row(String title, String? value) {
     return Padding(
@@ -24,8 +23,15 @@ class MessageView extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('$title: '),
-          Expanded(child: Text(value ?? 'N/A')),
+          Text(
+            '$title: ',
+            style: const TextStyle(color: Colors.black),
+          ),
+          Expanded(
+              child: Text(
+            value ?? 'N/A',
+            style: const TextStyle(color: Colors.black),
+          )),
         ],
       ),
     );
@@ -33,14 +39,23 @@ class MessageView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final MessageArguments args =
-        ModalRoute.of(context)!.settings.arguments! as MessageArguments;
+    final InformationArguments args =
+        ModalRoute.of(context)!.settings.arguments as InformationArguments;
     RemoteMessage message = args.message;
     RemoteNotification? notification = message.notification;
 
     return Scaffold(
+      backgroundColor: Colors.lightBlueAccent,
       appBar: AppBar(
-        title: Text(message.messageId ?? 'N/A'),
+        centerTitle: true,
+        backgroundColor: Colors.lightBlueAccent,
+        title: const Text(
+          'お問い合わせ画面',
+          style: TextStyle(
+            fontSize: 18,
+            color: Colors.black,
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -49,17 +64,7 @@ class MessageView extends StatelessWidget {
             children: [
               row('Triggered application open',
                   args.openedApplication.toString()),
-              row('Message ID', message.messageId),
-              row('Sender ID', message.senderId),
-              row('Category', message.category),
-              row('Collapse Key', message.collapseKey),
-              row('Content Available', message.contentAvailable.toString()),
-              row('Data', message.data.toString()),
-              row('From', message.from),
-              row('Message ID', message.messageId),
-              row('Sent Time', message.sentTime?.toString()),
-              row('Thread ID', message.threadId),
-              row('Time to Live (TTL)', message.ttl?.toString()),
+              row('Data', message.data['id']),
 
               ///notification を取得して、null じゃなかったら iOS/Android それぞれ固有のプロパティを表示
               if (notification != null) ...[
@@ -69,8 +74,11 @@ class MessageView extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        'Remote Notification',
-                        style: TextStyle(fontSize: 18),
+                        'お問い合わせ画面',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.black,
+                        ),
                       ),
                       row(
                         'Title',
@@ -84,47 +92,18 @@ class MessageView extends StatelessWidget {
                         const SizedBox(height: 16),
                         const Text(
                           'Android Properties',
-                          style: TextStyle(fontSize: 18),
-                        ),
-                        row(
-                          'Channel ID',
-                          notification.android!.channelId,
-                        ),
-                        row(
-                          'Click Action',
-                          notification.android!.clickAction,
-                        ),
-                        row(
-                          'Color',
-                          notification.android!.color,
-                        ),
-                        row(
-                          'Count',
-                          notification.android!.count?.toString(),
-                        ),
-                        row(
-                          'Image URL',
-                          notification.android!.imageUrl,
-                        ),
-                        row(
-                          'Link',
-                          notification.android!.link,
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.black,
+                          ),
                         ),
                         row(
                           'Priority',
                           notification.android!.priority.toString(),
                         ),
                         row(
-                          'Small Icon',
-                          notification.android!.smallIcon,
-                        ),
-                        row(
                           'Sound',
                           notification.android!.sound,
-                        ),
-                        row(
-                          'Ticker',
-                          notification.android!.ticker,
                         ),
                         row(
                           'Visibility',
@@ -132,9 +111,13 @@ class MessageView extends StatelessWidget {
                         ),
                       ],
                       if (notification.apple != null) ...[
+                        const SizedBox(height: 16),
                         const Text(
                           'Apple Properties',
-                          style: TextStyle(fontSize: 18),
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.black,
+                          ),
                         ),
                         row(
                           'Subtitle',

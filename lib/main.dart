@@ -4,11 +4,13 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
+import 'package:practice_cloud_functions/pages/home.dart';
+import 'package:practice_cloud_functions/pages/information.dart';
+import 'package:practice_cloud_functions/pages/message.dart';
+import 'package:practice_cloud_functions/pages/offer.dart';
 import 'package:practice_cloud_functions/permissions.dart';
 import 'package:practice_cloud_functions/token_monitor.dart';
 import 'package:simple_logger/simple_logger.dart';
-
-import 'message.dart';
 import 'message_list.dart';
 
 final logger = SimpleLogger();
@@ -79,7 +81,10 @@ class MessagingExampleApp extends StatelessWidget {
       theme: ThemeData.dark(),
       routes: {
         '/': (context) => const Application(),
+        '/offer': (context) => const OfferView(),
         '/message': (context) => const MessageView(),
+        '/home': (context) => const HomeView(),
+        '/information': (context) => const InformationView(),
       },
     );
   }
@@ -120,9 +125,25 @@ class _Application extends State<Application> {
     ///通知メッセージからアプリを起動したら Navigator.pushNamed で自動で画面遷移
     FirebaseMessaging.instance.getInitialMessage().then(
       (RemoteMessage? message) {
-        if (message != null) {
-          Navigator.pushNamed(context, '/message',
-              arguments: MessageArguments(message, true));
+        switch (message!.data['id']) {
+          case '1':
+            Navigator.pushNamed(context, '/offer',
+                arguments: OfferArguments(message, true));
+            break;
+          case '2':
+            Navigator.pushNamed(context, '/message',
+                arguments: MessageArguments(message, true));
+            break;
+          case '3':
+            Navigator.pushNamed(context, '/home',
+                arguments: HomeArguments(message, true));
+            break;
+          case '4':
+            Navigator.pushNamed(context, '/information',
+                arguments: InformationArguments(message, true));
+            break;
+          default:
+            break;
         }
       },
     );
@@ -153,10 +174,30 @@ class _Application extends State<Application> {
     ///でバックグラウンド状態でプッシュ通知メッセージからアプリを起動した場合に
     ///メッセージ詳細画面へ遷移する実装
     ///通知メッセージからアプリを起動したら Navigator.pushNamed で自動で画面遷移
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      Navigator.pushNamed(context, '/message',
-          arguments: MessageArguments(message, true));
-    });
+    FirebaseMessaging.onMessageOpenedApp.listen(
+      (RemoteMessage message) {
+        switch (message.data['id']) {
+          case '1':
+            Navigator.pushNamed(context, '/offer',
+                arguments: OfferArguments(message, true));
+            break;
+          case '2':
+            Navigator.pushNamed(context, '/message',
+                arguments: MessageArguments(message, true));
+            break;
+          case '3':
+            Navigator.pushNamed(context, '/home',
+                arguments: HomeArguments(message, true));
+            break;
+          case '4':
+            Navigator.pushNamed(context, '/information',
+                arguments: InformationArguments(message, true));
+            break;
+          default:
+            break;
+        }
+      },
+    );
   }
 
   Future<void> sendPushMessage() async {
@@ -165,8 +206,9 @@ class _Application extends State<Application> {
     }
 
     try {
+      logger.info('メッセージ送信');
       await http.post(
-        Uri.parse('https://api.rnfirebase.io/messaging/send'),
+        Uri.parse('https://fcm.googleapis.com/fcm/send'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },

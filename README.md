@@ -1,17 +1,12 @@
 # practice_cloud_functions
 
-A new Flutter application.
+## Terminal Push通知　参考記事
 
-## Getting Started
+- https://www.aizulab.com/blog/android-firebase-fcm/
 
-This project is a starting point for a Flutter application.
+## Push通知　コマンド
 
-A few resources to get you started if this is your first Flutter project:
+- chmod 755 ~/push.sh
+- ~/push.sh
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-# practice_cloud_functions

@@ -1,7 +1,9 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-
-import 'message.dart';
+import 'package:practice_cloud_functions/pages/home.dart';
+import 'package:practice_cloud_functions/pages/information.dart';
+import 'package:practice_cloud_functions/pages/message.dart';
+import 'package:practice_cloud_functions/pages/offer.dart';
 
 ///プッシュ通知受信履歴一覧の Widget
 class MessageList extends StatefulWidget {
@@ -40,15 +42,49 @@ class _MessageList extends State<MessageList> {
           RemoteMessage message = _messages[index];
 
           return ListTile(
-            title: Text(
-                message.messageId ?? 'no RemoteMessage.messageId available'),
-            subtitle:
-                Text(message.sentTime?.toString() ?? DateTime.now().toString()),
+              title: Text(
+                  message.messageId ?? 'no RemoteMessage.messageId available'),
+              subtitle: Text(
+                  message.sentTime?.toString() ?? DateTime.now().toString()),
 
-            ///プッシュ通知受信一覧をタップするとメッセージ詳細画面へ遷移
-            onTap: () => Navigator.pushNamed(context, '/message',
-                arguments: MessageArguments(message, false)),
-          );
+              ///プッシュ通知受信一覧をタップするとメッセージ詳細画面へ遷移
+              onTap: () {
+                switch (message.data['id']) {
+                  case '1':
+                    Navigator.pushNamed(
+                      context,
+                      '/offer',
+                      arguments: OfferArguments(message, false),
+                    );
+                    break;
+                  case '2':
+                    Navigator.pushNamed(
+                      context,
+                      '/message',
+                      arguments: MessageArguments(message, false),
+                    );
+                    break;
+                  case '3':
+                    Navigator.pushNamed(
+                      context,
+                      '/home',
+                      arguments: HomeArguments(message, false),
+                    );
+                    break;
+                  case '4':
+                    Navigator.pushNamed(
+                      context,
+                      '/information',
+                      arguments: InformationArguments(message, false),
+                    );
+                    break;
+                  default:
+                    Navigator.pushNamed(
+                      context,
+                      '/',
+                    );
+                }
+              });
         });
   }
 }
