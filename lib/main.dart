@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
 import 'package:practice_cloud_functions/pages/home.dart';
@@ -16,9 +17,11 @@ import 'message_list.dart';
 final logger = SimpleLogger();
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  ///アプリがフォアグラウンドの時以外にこの handler からアプリを起動された時の為にここでも
-  ///await Firebase.initializeApp()
+  ///アプリがフォアグラウンドの時以外にこの handler
+  ///からアプリを起動された時の為にFirebase初期化
   await Firebase.initializeApp();
+
+  logger.info('フォアグラウンド以外メッセージ ☛ ${message.notification!.title}');
 }
 
 ///Android特有のチャンネル
@@ -59,6 +62,8 @@ void main() async {
           AndroidFlutterLocalNotificationsPlugin>()
       ?.createNotificationChannel(channel);
 
+  FirebaseMessaging.instance.subscribeToTopic('all');
+
   ///iOS 固有のフォアグラウンドのプッシュ通知受信時アクションを設定
   await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
     alert: true,
@@ -95,8 +100,11 @@ int _messageCount = 0;
 String constructFCMPayload(String token) {
   _messageCount++;
   return jsonEncode({
+    'api_key':
+        'AAAAqgm6bao:APA91bHqwVMmuHw1AsU7g8kAyRtmQvFVUYfYVEUMvXTXho27xiQAuS_c7wvsxvo5tlxALlRwkeFDGcilTQnMxcYdfGHvbwbIO1VFjrk_WOiDo3l24fs2bSY9wZkAJS0Nn2ZMbUw0UxTl',
     'token': token,
     'data': {
+      'id': '1',
       'via': 'FlutterFire Cloud Messaging!!!',
       'count': _messageCount.toString(),
     },
@@ -123,81 +131,83 @@ class _Application extends State<Application> {
 
     ///アプリのタスクを落としてる状態でプッシュ通知からアプリを起動した時のアクションを実装
     ///通知メッセージからアプリを起動したら Navigator.pushNamed で自動で画面遷移
-    FirebaseMessaging.instance.getInitialMessage().then(
-      (RemoteMessage? message) {
-        switch (message!.data['id']) {
-          case '1':
-            Navigator.pushNamed(context, '/offer',
-                arguments: OfferArguments(message, true));
-            break;
-          case '2':
-            Navigator.pushNamed(context, '/message',
-                arguments: MessageArguments(message, true));
-            break;
-          case '3':
-            Navigator.pushNamed(context, '/home',
-                arguments: HomeArguments(message, true));
-            break;
-          case '4':
-            Navigator.pushNamed(context, '/information',
-                arguments: InformationArguments(message, true));
-            break;
-          default:
-            break;
-        }
-      },
-    );
+    // FirebaseMessaging.instance.getInitialMessage().then(
+    //   (RemoteMessage? message) {
+    //     switch (message!.data['id']) {
+    //       case '1':
+    //         Navigator.pushNamed(context, '/offer',
+    //             arguments: OfferArguments(message, true));
+    //         break;
+    //       case '2':
+    //         Navigator.pushNamed(context, '/message',
+    //             arguments: MessageArguments(message, true));
+    //         break;
+    //       case '3':
+    //         Navigator.pushNamed(context, '/home',
+    //             arguments: HomeArguments(message, true));
+    //         break;
+    //       case '4':
+    //         Navigator.pushNamed(context, '/information',
+    //             arguments: InformationArguments(message, true));
+    //         break;
+    //       default:
+    //         break;
+    //     }
+    //   },
+    // );
 
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      RemoteNotification? notification = message.notification;
-      AndroidNotification? android = message.notification?.android;
+    ///FirebaseMessaging.onMessage.listen で取得したプッシュ通知のメッセージオブジェクト
+    ///RemoteNotification とそのプロパティである AndroidNotification が null
+    ///じゃなかったら flutterLocalNotificationsPlugin.show でローカル通知を表示
 
-      ///FirebaseMessaging.onMessage.listen で取得したプッシュ通知のメッセージオブジェクト
-      ///RemoteNotification とそのプロパティである AndroidNotification が null
-      ///じゃなかったら flutterLocalNotificationsPlugin.show でローカル通知を表示
-      if (notification != null && android != null) {
-        flutterLocalNotificationsPlugin.show(
-            notification.hashCode,
-            notification.title,
-            notification.body,
-            NotificationDetails(
-              android: AndroidNotificationDetails(
-                channel.id,
-                channel.name,
-                icon: 'launch_background',
-              ),
-            ));
-      }
-    });
+    // FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    //   RemoteNotification? notification = message.notification;
+    //   AndroidNotification? android = message.notification?.android;
+    //
+    //
+    //   if (notification != null && android != null) {
+    //     flutterLocalNotificationsPlugin.show(
+    //         notification.hashCode,
+    //         notification.title,
+    //         notification.body,
+    //         NotificationDetails(
+    //           android: AndroidNotificationDetails(
+    //             channel.id,
+    //             channel.name,
+    //             icon: 'launch_background',
+    //           ),
+    //         ));
+    //   }
+    // });
 
     ///FirebaseMessaging.onMessageOpenedApp.listen
     ///でバックグラウンド状態でプッシュ通知メッセージからアプリを起動した場合に
     ///メッセージ詳細画面へ遷移する実装
     ///通知メッセージからアプリを起動したら Navigator.pushNamed で自動で画面遷移
-    FirebaseMessaging.onMessageOpenedApp.listen(
-      (RemoteMessage message) {
-        switch (message.data['id']) {
-          case '1':
-            Navigator.pushNamed(context, '/offer',
-                arguments: OfferArguments(message, true));
-            break;
-          case '2':
-            Navigator.pushNamed(context, '/message',
-                arguments: MessageArguments(message, true));
-            break;
-          case '3':
-            Navigator.pushNamed(context, '/home',
-                arguments: HomeArguments(message, true));
-            break;
-          case '4':
-            Navigator.pushNamed(context, '/information',
-                arguments: InformationArguments(message, true));
-            break;
-          default:
-            break;
-        }
-      },
-    );
+    // FirebaseMessaging.onMessageOpenedApp.listen(
+    //   (RemoteMessage message) {
+    //     switch (message.data['id']) {
+    //       case '1':
+    //         Navigator.pushNamed(context, '/offer',
+    //             arguments: OfferArguments(message, true));
+    //         break;
+    //       case '2':
+    //         Navigator.pushNamed(context, '/message',
+    //             arguments: MessageArguments(message, true));
+    //         break;
+    //       case '3':
+    //         Navigator.pushNamed(context, '/home',
+    //             arguments: HomeArguments(message, true));
+    //         break;
+    //       case '4':
+    //         Navigator.pushNamed(context, '/information',
+    //             arguments: InformationArguments(message, true));
+    //         break;
+    //       default:
+    //         break;
+    //     }
+    //   },
+    // );
   }
 
   Future<void> sendPushMessage() async {

@@ -6,7 +6,7 @@
 
 ## Push通知　コマンド
 
-- chmod 755 ~/push.sh
-- ~/push.sh
+- chmod 755 ~/practice_push.sh
+- ~/practice_push.sh
 
 
